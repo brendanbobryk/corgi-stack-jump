@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-const PLATFORM_WIDTH = 120
+const PLATFORM_WIDTH = 140
 const PLATFORM_HEIGHT = 20
 const MOVE_SPEED = 2
-const GAME_WIDTH = 300
+const GAME_WIDTH = 400  // updated from 300px
 
 function App() {
-  const [platforms, setPlatforms] = useState([{ x: 140, y: 360 }])
+  const [platforms, setPlatforms] = useState([{ x: 130, y: 360 }]) // adjust initial X
   const [direction, setDirection] = useState(1)
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
@@ -17,16 +17,13 @@ function App() {
 
     const interval = setInterval(() => {
       setPlatforms(prev => {
-        const top = prev[prev.length - 1]
+        const top = prev.at(-1)
         let newX = top.x + direction * MOVE_SPEED
 
-        // LEFT boundary
         if (newX <= 0) {
           newX = 0
           setDirection(1)
         }
-
-        // RIGHT boundary
         if (newX >= GAME_WIDTH - PLATFORM_WIDTH) {
           newX = GAME_WIDTH - PLATFORM_WIDTH
           setDirection(-1)
@@ -55,7 +52,7 @@ function App() {
   }
 
   const reset = () => {
-    setPlatforms([{ x: 140, y: 360 }])
+    setPlatforms([{ x: 130, y: 360 }])
     setDirection(1)
     setGameOver(false)
     setScore(0)

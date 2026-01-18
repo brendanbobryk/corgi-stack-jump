@@ -47,7 +47,7 @@ h1 {
 /* Game area */
 .game {
   position: relative;
-  width: 300px;
+  width: 400px;  /* updated from 300px */
   height: 400px;
   background: linear-gradient(180deg, #16162a, #0f0f1c);
   border-radius: 20px;
@@ -60,7 +60,7 @@ h1 {
 /* Platforms */
 .platform {
   position: absolute;
-  width: 120px;
+  width: 140px; /* updated */
   height: 20px;
   background: linear-gradient(135deg, #5f7cff, #7b8cff);
   border-radius: 10px;
