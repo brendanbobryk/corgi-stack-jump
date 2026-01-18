@@ -5,10 +5,10 @@ const GAME_WIDTH = 400
 const GAME_HEIGHT = 400
 const BLOCK_SIZE = 40
 const BLOCK_HEIGHT = 20
-const INITIAL_BLOCKS = 7
-const MOVE_SPEED_BASE = 300 // milliseconds per block
+const INITIAL_BLOCKS = 4 // start narrower
+const MOVE_SPEED_BASE = 400 // milliseconds per block, slowest
+const SPEED_INCREASE = 15 // speed up per row
 
-// Helper to snap a starting x to the grid
 const snapToGrid = x => Math.floor(x / BLOCK_SIZE) * BLOCK_SIZE
 
 function App() {
@@ -33,13 +33,12 @@ function App() {
     if (!movingRow && !gameOver) {
       const y = topRow.y - BLOCK_HEIGHT
       const blocks = topRow.blocks
-      // start moving row at x=0 (grid aligned)
       setMovingRow({ x: 0, y, blocks })
       setDirection(1)
     }
   }, [movingRow, topRow, gameOver])
 
-  // Move the sliding row in a grid-aligned fashion
+  // Move the sliding row in grid-aligned steps
   useEffect(() => {
     if (!movingRow || gameOver) return
 
@@ -60,7 +59,7 @@ function App() {
         setDirection(newDir)
         return { ...prev, x: newX }
       })
-    }, MOVE_SPEED_BASE - stack.length * 15)
+    }, Math.max(50, MOVE_SPEED_BASE - stack.length * SPEED_INCREASE)) // faster as stack grows
 
     return () => clearInterval(interval)
   }, [movingRow, direction, stack, gameOver])
@@ -82,7 +81,6 @@ function App() {
       return
     }
 
-    // snap the new row to the grid
     const snappedX = snapToGrid(overlapStart)
 
     setStack(p => [
