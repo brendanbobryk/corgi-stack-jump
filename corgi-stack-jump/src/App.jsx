@@ -5,60 +5,77 @@ const PLATFORM_HEIGHT = 20
 const MOVE_SPEED = 2
 const GAME_WIDTH = 400
 const BASE_PLATFORM_WIDTH = 140
-const PLATFORM_SHRINK_STEP = 4 // px per stack
+const PLATFORM_SHRINK_STEP = 4
+const MIN_PLATFORM_WIDTH = 60
 
 function App() {
   const [platforms, setPlatforms] = useState([{ x: 130, y: 360, width: BASE_PLATFORM_WIDTH }])
+  const [movingPlatform, setMovingPlatform] = useState(null)
   const [direction, setDirection] = useState(1)
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
 
+  // Dog always on last stable platform
+  const topPlatform = platforms.at(-1)
+  const corgiX = topPlatform.x + 30
+  const corgiY = topPlatform.y - 20
+
+  // Auto-spawn new moving platform if none exists
   useEffect(() => {
     if (gameOver) return
+    if (!movingPlatform) {
+      const newWidth = Math.max(MIN_PLATFORM_WIDTH, topPlatform.width - PLATFORM_SHRINK_STEP)
+      const newY = topPlatform.y - PLATFORM_HEIGHT
+      setMovingPlatform({ x: 0, y: newY, width: newWidth })
+      setDirection(1)
+    }
+  }, [movingPlatform, topPlatform, gameOver])
+
+  // Move the sliding platform
+  useEffect(() => {
+    if (!movingPlatform || gameOver) return
 
     const interval = setInterval(() => {
-      setPlatforms(prev => {
-        const top = prev.at(-1)
-        let newX = top.x + direction * MOVE_SPEED
+      setMovingPlatform(prev => {
+        let newX = prev.x + direction * MOVE_SPEED
+        let newDir = direction
 
         if (newX <= 0) {
           newX = 0
-          setDirection(1)
+          newDir = 1
         }
-        if (newX >= GAME_WIDTH - top.width) {
-          newX = GAME_WIDTH - top.width
-          setDirection(-1)
+        if (newX >= GAME_WIDTH - prev.width) {
+          newX = GAME_WIDTH - prev.width
+          newDir = -1
         }
 
-        return [...prev.slice(0, -1), { ...top, x: newX, width: top.width }]
+        setDirection(newDir)
+        return { ...prev, x: newX }
       })
     }, 16)
 
     return () => clearInterval(interval)
-  }, [direction, gameOver])
+  }, [movingPlatform, direction, gameOver])
 
-  const jump = () => {
-    if (gameOver) return
+  // Drop the moving platform
+  const drop = () => {
+    if (!movingPlatform || gameOver) return
 
-    const top = platforms.at(-1)
-    const prev = platforms.at(-2)
-
-    // Misalignment check
-    if (prev && Math.abs(top.x - prev.x) > top.width * 0.6) {
+    const overlap = Math.abs(movingPlatform.x - topPlatform.x)
+    if (overlap > topPlatform.width * 0.6) {
       setGameOver(true)
       return
     }
 
-    // Shrink the next platform
-    const newWidth = Math.max(60, top.width - PLATFORM_SHRINK_STEP)
-    const newY = top.y - PLATFORM_HEIGHT
-
-    setPlatforms(p => [...p, { x: top.x, y: newY, width: newWidth }])
+    // Add to stable platforms
+    setPlatforms(p => [...p, { ...movingPlatform }])
+    setMovingPlatform(null)
     setScore(s => s + 1)
   }
 
   const reset = () => {
     setPlatforms([{ x: 130, y: 360, width: BASE_PLATFORM_WIDTH }])
+    setMovingPlatform(null)
     setDirection(1)
     setGameOver(false)
     setScore(0)
@@ -66,25 +83,31 @@ function App() {
 
   return (
     <div className="center-wrapper">
-      <div className="card" onClick={jump}>
+      <div className="card" onClick={drop}>
         <h1>🐕 Corgi Stack Jump</h1>
 
         <div className="game">
           {platforms.map((p, i) => (
             <div
-              key={i}
+              key={`stable-${i}`}
               className="platform"
               style={{ left: p.x, top: p.y, width: p.width }}
             />
           ))}
 
-          <div
-            className="corgi"
-            style={{
-              left: platforms.at(-1).x + 30,
-              top: platforms.at(-1).y - 20 // lowered slightly so dog sits on top
-            }}
-          >
+          {movingPlatform && (
+            <div
+              className="platform moving"
+              style={{
+                left: movingPlatform.x,
+                top: movingPlatform.y,
+                width: movingPlatform.width
+              }}
+            />
+          )}
+
+          {/* Dog stays on last stable platform */}
+          <div className="corgi" style={{ left: corgiX, top: corgiY }}>
             🐕
           </div>
 
@@ -97,7 +120,7 @@ function App() {
         </div>
 
         <p className="score">Score: {score}</p>
-        <p className="hint">Click to stack!</p>
+        <p className="hint">Click to drop the moving platform!</p>
       </div>
     </div>
   )

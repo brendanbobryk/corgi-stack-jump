@@ -62,6 +62,10 @@ h1 {
   transition: top 0.15s ease, left 0.15s ease, width 0.15s ease;
 }
 
+.platform.moving {
+  background: linear-gradient(135deg, #ff7f7f, #ff9999);
+}
+
 .corgi {
   position: absolute;
   font-size: 2rem;
