@@ -16,7 +16,6 @@ body {
   font-family: system-ui, sans-serif;
 }
 
-/* 🔥 TRUE CENTERING */
 .center-wrapper {
   position: fixed;
   top: 50%;
@@ -24,7 +23,6 @@ body {
   transform: translate(-50%, -50%);
 }
 
-/* Card */
 .card {
   background: linear-gradient(180deg, #1a1a30, #11111f);
   padding: 2rem 2.2rem 1.6rem;
@@ -38,16 +36,14 @@ body {
   gap: 0.6rem;
 }
 
-/* Title */
 h1 {
   margin: 0 0 0.4rem;
   font-size: 2.4rem;
 }
 
-/* Game area */
 .game {
   position: relative;
-  width: 400px;  /* updated from 300px */
+  width: 400px;
   height: 400px;
   background: linear-gradient(180deg, #16162a, #0f0f1c);
   border-radius: 20px;
@@ -57,26 +53,32 @@ h1 {
     0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
-/* Platforms */
 .platform {
   position: absolute;
-  width: 140px; /* updated */
   height: 20px;
   background: linear-gradient(135deg, #5f7cff, #7b8cff);
   border-radius: 10px;
   box-shadow: 0 6px 14px rgba(95, 124, 255, 0.5);
-  transition: top 0.15s ease;
+  transition: top 0.15s ease, left 0.15s ease, width 0.15s ease;
 }
 
-/* Corgi */
 .corgi {
   position: absolute;
   font-size: 2rem;
   filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.6));
-  transition: top 0.15s ease;
+  transition: top 0.25s ease;
 }
 
-/* Overlay */
+.score {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.hint {
+  font-size: 0.9rem;
+  opacity: 0.65;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
@@ -89,18 +91,6 @@ h1 {
   font-size: 1.6rem;
 }
 
-/* Footer text */
-.score {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.hint {
-  font-size: 0.9rem;
-  opacity: 0.65;
-}
-
-/* Button */
 button {
   padding: 0.6rem 1.6rem;
   border-radius: 999px;
