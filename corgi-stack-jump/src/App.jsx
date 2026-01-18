@@ -4,6 +4,7 @@ import './App.css'
 const PLATFORM_WIDTH = 120
 const PLATFORM_HEIGHT = 20
 const MOVE_SPEED = 2
+const GAME_WIDTH = 300
 
 function App() {
   const [platforms, setPlatforms] = useState([{ x: 140, y: 360 }])
@@ -19,9 +20,16 @@ function App() {
         const top = prev[prev.length - 1]
         let newX = top.x + direction * MOVE_SPEED
 
-        if (newX <= 0 || newX >= 300 - PLATFORM_WIDTH) {
-          setDirection(d => -d)
-          newX = top.x
+        // LEFT boundary
+        if (newX <= 0) {
+          newX = 0
+          setDirection(1)
+        }
+
+        // RIGHT boundary
+        if (newX >= GAME_WIDTH - PLATFORM_WIDTH) {
+          newX = GAME_WIDTH - PLATFORM_WIDTH
+          setDirection(-1)
         }
 
         return [...prev.slice(0, -1), { ...top, x: newX }]
