@@ -6,9 +6,7 @@ const PLATFORM_HEIGHT = 20
 const MOVE_SPEED = 2
 
 function App() {
-  const [platforms, setPlatforms] = useState([
-    { x: 140, y: 360 }
-  ])
+  const [platforms, setPlatforms] = useState([{ x: 140, y: 360 }])
   const [direction, setDirection] = useState(1)
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
@@ -26,10 +24,7 @@ function App() {
           newX = top.x
         }
 
-        return [
-          ...prev.slice(0, -1),
-          { ...top, x: newX }
-        ]
+        return [...prev.slice(0, -1), { ...top, x: newX }]
       })
     }, 16)
 
@@ -39,18 +34,15 @@ function App() {
   const jump = () => {
     if (gameOver) return
 
-    const top = platforms[platforms.length - 1]
-    const prev = platforms[platforms.length - 2]
+    const top = platforms.at(-1)
+    const prev = platforms.at(-2)
 
     if (prev && Math.abs(top.x - prev.x) > PLATFORM_WIDTH * 0.6) {
       setGameOver(true)
       return
     }
 
-    setPlatforms(prev => [
-      ...prev,
-      { x: top.x, y: top.y - PLATFORM_HEIGHT }
-    ])
+    setPlatforms(p => [...p, { x: top.x, y: top.y - PLATFORM_HEIGHT }])
     setScore(s => s + 1)
   }
 
@@ -62,39 +54,40 @@ function App() {
   }
 
   return (
-    <div className="container" onClick={jump}>
-      <h1>🐕 Corgi Stack Jump</h1>
+    <div className="center-wrapper">
+      <div className="card" onClick={jump}>
+        <h1>🐕 Corgi Stack Jump</h1>
 
-      <div className="game">
-        {platforms.map((p, i) => (
+        <div className="game">
+          {platforms.map((p, i) => (
+            <div
+              key={i}
+              className="platform"
+              style={{ left: p.x, top: p.y }}
+            />
+          ))}
+
           <div
-            key={i}
-            className="platform"
-            style={{ left: p.x, top: p.y }}
-          />
-        ))}
+            className="corgi"
+            style={{
+              left: platforms.at(-1).x + 30,
+              top: platforms.at(-1).y - 36
+            }}
+          >
+            🐕
+          </div>
 
-        <div
-          className="corgi"
-          style={{
-            left: platforms[platforms.length - 1].x + 30,
-            top: platforms[platforms.length - 1].y - 36
-          }}
-        >
-          🐕
+          {gameOver && (
+            <div className="overlay">
+              <p>💥 Game Over</p>
+              <button onClick={reset}>Restart</button>
+            </div>
+          )}
         </div>
+
+        <p className="score">Score: {score}</p>
+        <p className="hint">Click to stack</p>
       </div>
-
-      <p className="score">Score: {score}</p>
-
-      {gameOver && (
-        <div className="overlay">
-          <p>💥 Game Over</p>
-          <button onClick={reset}>Restart</button>
-        </div>
-      )}
-
-      <p className="hint">Click to stack!</p>
     </div>
   )
 }

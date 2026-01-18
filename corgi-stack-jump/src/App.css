@@ -2,59 +2,81 @@
   box-sizing: border-box;
 }
 
-body {
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
   margin: 0;
-  background: radial-gradient(circle at top, #1f1f35, #0e0e16);
+}
+
+body {
+  background: radial-gradient(circle at top, #2a2a4a, #0b0b12 70%);
   color: #eaeaf0;
   font-family: system-ui, sans-serif;
 }
 
-.container {
-  min-height: 100vh;
+/* 🔥 TRUE CENTERING */
+.center-wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Card */
+.card {
+  background: linear-gradient(180deg, #1a1a30, #11111f);
+  padding: 2rem 2.2rem 1.6rem;
+  border-radius: 28px;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
 }
 
+/* Title */
 h1 {
-  font-size: 2.5rem;
+  margin: 0 0 0.4rem;
+  font-size: 2.4rem;
 }
 
+/* Game area */
 .game {
   position: relative;
   width: 300px;
   height: 400px;
   background: linear-gradient(180deg, #16162a, #0f0f1c);
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
+/* Platforms */
 .platform {
   position: absolute;
   width: 120px;
   height: 20px;
   background: linear-gradient(135deg, #5f7cff, #7b8cff);
   border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(95, 124, 255, 0.5);
   transition: top 0.15s ease;
 }
 
+/* Corgi */
 .corgi {
   position: absolute;
   font-size: 2rem;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.6));
   transition: top 0.15s ease;
 }
 
-.score {
-  font-size: 1.2rem;
-}
-
-.hint {
-  opacity: 0.6;
-}
-
+/* Overlay */
 .overlay {
   position: absolute;
   inset: 0;
@@ -64,9 +86,21 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
 }
 
+/* Footer text */
+.score {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.hint {
+  font-size: 0.9rem;
+  opacity: 0.65;
+}
+
+/* Button */
 button {
   padding: 0.6rem 1.6rem;
   border-radius: 999px;
@@ -75,4 +109,10 @@ button {
   background: linear-gradient(135deg, #5f7cff, #7b8cff);
   color: white;
   font-size: 1rem;
+  box-shadow: 0 12px 24px rgba(95, 124, 255, 0.45);
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(95, 124, 255, 0.6);
 }
