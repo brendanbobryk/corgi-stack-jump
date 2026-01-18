@@ -8,12 +8,15 @@ const BLOCK_HEIGHT = 20
 const INITIAL_BLOCKS = 7
 const MOVE_SPEED_BASE = 300 // milliseconds per block
 
+// Helper to snap a starting x to the grid
+const snapToGrid = x => Math.floor(x / BLOCK_SIZE) * BLOCK_SIZE
+
 function App() {
   const [stack, setStack] = useState([
     {
       y: GAME_HEIGHT - BLOCK_HEIGHT,
       blocks: INITIAL_BLOCKS,
-      x: Math.floor((GAME_WIDTH - INITIAL_BLOCKS * BLOCK_SIZE) / BLOCK_SIZE) * BLOCK_SIZE,
+      x: snapToGrid((GAME_WIDTH - INITIAL_BLOCKS * BLOCK_SIZE) / 2),
     },
   ])
   const [movingRow, setMovingRow] = useState(null)
@@ -30,6 +33,7 @@ function App() {
     if (!movingRow && !gameOver) {
       const y = topRow.y - BLOCK_HEIGHT
       const blocks = topRow.blocks
+      // start moving row at x=0 (grid aligned)
       setMovingRow({ x: 0, y, blocks })
       setDirection(1)
     }
@@ -44,7 +48,6 @@ function App() {
         let newX = prev.x + direction * BLOCK_SIZE
         let newDir = direction
 
-        // Wrap within grid
         if (newX < 0) {
           newX = 0
           newDir = 1
@@ -57,7 +60,7 @@ function App() {
         setDirection(newDir)
         return { ...prev, x: newX }
       })
-    }, MOVE_SPEED_BASE - stack.length * 15) // increase speed gradually
+    }, MOVE_SPEED_BASE - stack.length * 15)
 
     return () => clearInterval(interval)
   }, [movingRow, direction, stack, gameOver])
@@ -79,9 +82,12 @@ function App() {
       return
     }
 
+    // snap the new row to the grid
+    const snappedX = snapToGrid(overlapStart)
+
     setStack(p => [
       ...p,
-      { x: overlapStart, y: movingRow.y, blocks: overlapBlocks },
+      { x: snappedX, y: movingRow.y, blocks: overlapBlocks },
     ])
     setMovingRow(null)
     setScore(score + 1)
@@ -92,7 +98,7 @@ function App() {
       {
         y: GAME_HEIGHT - BLOCK_HEIGHT,
         blocks: INITIAL_BLOCKS,
-        x: Math.floor((GAME_WIDTH - INITIAL_BLOCKS * BLOCK_SIZE) / BLOCK_SIZE) * BLOCK_SIZE,
+        x: snapToGrid((GAME_WIDTH - INITIAL_BLOCKS * BLOCK_SIZE) / 2),
       },
     ])
     setMovingRow(null)
