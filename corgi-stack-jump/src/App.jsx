@@ -1,51 +1,51 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-const PLATFORM_HEIGHT = 20
-const MOVE_SPEED = 2
 const GAME_WIDTH = 400
-const BASE_PLATFORM_WIDTH = 140
-const PLATFORM_SHRINK_STEP = 4
-const MIN_PLATFORM_WIDTH = 60
+const GAME_HEIGHT = 400
+const BLOCK_HEIGHT = 20
+const INITIAL_BLOCKS = 7 // starting blocks in the first row
+const MOVE_SPEED_BASE = 2
 
 function App() {
-  const [platforms, setPlatforms] = useState([{ x: 130, y: 360, width: BASE_PLATFORM_WIDTH }])
-  const [movingPlatform, setMovingPlatform] = useState(null)
+  const [stack, setStack] = useState([
+    { y: GAME_HEIGHT - BLOCK_HEIGHT, blocks: INITIAL_BLOCKS, x: Math.floor((GAME_WIDTH - INITIAL_BLOCKS * 40) / 2) }
+  ])
+  const [movingRow, setMovingRow] = useState(null)
   const [direction, setDirection] = useState(1)
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
 
-  // Dog always on last stable platform
-  const topPlatform = platforms.at(-1)
-  const corgiX = topPlatform.x + 30
-  const corgiY = topPlatform.y - 20
+  // Dog sits on top of last stable row
+  const topRow = stack[stack.length - 1]
+  const corgiX = topRow.x + (topRow.blocks * 40) / 2 - 20
+  const corgiY = topRow.y - 30
 
-  // Auto-spawn new moving platform if none exists
+  // Spawn new moving row
   useEffect(() => {
-    if (gameOver) return
-    if (!movingPlatform) {
-      const newWidth = Math.max(MIN_PLATFORM_WIDTH, topPlatform.width - PLATFORM_SHRINK_STEP)
-      const newY = topPlatform.y - PLATFORM_HEIGHT
-      setMovingPlatform({ x: 0, y: newY, width: newWidth })
+    if (!movingRow && !gameOver) {
+      const y = topRow.y - BLOCK_HEIGHT
+      const blocks = topRow.blocks
+      setMovingRow({ x: 0, y, blocks })
       setDirection(1)
     }
-  }, [movingPlatform, topPlatform, gameOver])
+  }, [movingRow, topRow, gameOver])
 
-  // Move the sliding platform
+  // Move the sliding row
   useEffect(() => {
-    if (!movingPlatform || gameOver) return
+    if (!movingRow || gameOver) return
 
     const interval = setInterval(() => {
-      setMovingPlatform(prev => {
-        let newX = prev.x + direction * MOVE_SPEED
+      setMovingRow(prev => {
+        let newX = prev.x + direction * (MOVE_SPEED_BASE + stack.length * 0.3)
         let newDir = direction
 
         if (newX <= 0) {
           newX = 0
           newDir = 1
         }
-        if (newX >= GAME_WIDTH - prev.width) {
-          newX = GAME_WIDTH - prev.width
+        if (newX + prev.blocks * 40 >= GAME_WIDTH) {
+          newX = GAME_WIDTH - prev.blocks * 40
           newDir = -1
         }
 
@@ -55,27 +55,40 @@ function App() {
     }, 16)
 
     return () => clearInterval(interval)
-  }, [movingPlatform, direction, gameOver])
+  }, [movingRow, direction, stack, gameOver])
 
-  // Drop the moving platform
+  // Drop the moving row
   const drop = () => {
-    if (!movingPlatform || gameOver) return
+    if (!movingRow || gameOver) return
 
-    const overlap = Math.abs(movingPlatform.x - topPlatform.x)
-    if (overlap > topPlatform.width * 0.6) {
+    const prevRow = topRow
+    const movingStart = movingRow.x
+    const movingEnd = movingRow.x + movingRow.blocks * 40
+    const prevStart = prevRow.x
+    const prevEnd = prevRow.x + prevRow.blocks * 40
+
+    const overlapStart = Math.max(movingStart, prevStart)
+    const overlapEnd = Math.min(movingEnd, prevEnd)
+    const overlapBlocks = Math.floor((overlapEnd - overlapStart) / 40)
+
+    if (overlapBlocks <= 0) {
       setGameOver(true)
       return
     }
 
-    // Add to stable platforms
-    setPlatforms(p => [...p, { ...movingPlatform }])
-    setMovingPlatform(null)
-    setScore(s => s + 1)
+    setStack(p => [
+      ...p,
+      { x: overlapStart, y: movingRow.y, blocks: overlapBlocks }
+    ])
+    setMovingRow(null)
+    setScore(score + 1)
   }
 
   const reset = () => {
-    setPlatforms([{ x: 130, y: 360, width: BASE_PLATFORM_WIDTH }])
-    setMovingPlatform(null)
+    setStack([
+      { y: GAME_HEIGHT - BLOCK_HEIGHT, blocks: INITIAL_BLOCKS, x: Math.floor((GAME_WIDTH - INITIAL_BLOCKS * 40) / 2) }
+    ])
+    setMovingRow(null)
     setDirection(1)
     setGameOver(false)
     setScore(0)
@@ -84,29 +97,29 @@ function App() {
   return (
     <div className="center-wrapper">
       <div className="card" onClick={drop}>
-        <h1>🐕 Corgi Stack Jump</h1>
+        <h1>🐕 Corgi Stacker</h1>
 
         <div className="game">
-          {platforms.map((p, i) => (
-            <div
-              key={`stable-${i}`}
-              className="platform"
-              style={{ left: p.x, top: p.y, width: p.width }}
-            />
-          ))}
-
-          {movingPlatform && (
-            <div
-              className="platform moving"
-              style={{
-                left: movingPlatform.x,
-                top: movingPlatform.y,
-                width: movingPlatform.width
-              }}
-            />
+          {stack.map((row, i) =>
+            Array.from({ length: row.blocks }).map((_, j) => (
+              <div
+                key={`stack-${i}-${j}`}
+                className="block"
+                style={{ left: row.x + j * 40, top: row.y }}
+              />
+            ))
           )}
 
-          {/* Dog stays on last stable platform */}
+          {movingRow &&
+            Array.from({ length: movingRow.blocks }).map((_, j) => (
+              <div
+                key={`moving-${j}`}
+                className="block moving"
+                style={{ left: movingRow.x + j * 40, top: movingRow.y }}
+              />
+            ))}
+
+          {/* Dog sits on top of last stable row */}
           <div className="corgi" style={{ left: corgiX, top: corgiY }}>
             🐕
           </div>
@@ -120,7 +133,7 @@ function App() {
         </div>
 
         <p className="score">Score: {score}</p>
-        <p className="hint">Click to drop the moving platform!</p>
+        <p className="hint">Click to drop the moving row!</p>
       </div>
     </div>
   )

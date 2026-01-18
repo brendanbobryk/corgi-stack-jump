@@ -53,16 +53,17 @@ h1 {
     0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
-.platform {
+.block {
   position: absolute;
+  width: 40px;
   height: 20px;
   background: linear-gradient(135deg, #5f7cff, #7b8cff);
-  border-radius: 10px;
-  box-shadow: 0 6px 14px rgba(95, 124, 255, 0.5);
-  transition: top 0.15s ease, left 0.15s ease, width 0.15s ease;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(95, 124, 255, 0.5);
+  transition: left 0.1s ease;
 }
 
-.platform.moving {
+.block.moving {
   background: linear-gradient(135deg, #ff7f7f, #ff9999);
 }
 
@@ -70,7 +71,6 @@ h1 {
   position: absolute;
   font-size: 2rem;
   filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.6));
-  transition: top 0.25s ease;
 }
 
 .score {
