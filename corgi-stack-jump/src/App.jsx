@@ -31,7 +31,7 @@ function App() {
   const corgiX = topRow.x + (topRow.blocks * BLOCK_SIZE) / 2 - 20
   const corgiY = topRow.y - 30
 
-  // Check win condition
+  // Win condition
   useEffect(() => {
     if (topRow.y <= GOAL_Y && !win) {
       setWin(true)
@@ -97,8 +97,11 @@ function App() {
     const isPerfect =
       overlapBlocks === prev.blocks && overlapStart === prev.x
 
+    let pointsEarned = overlapBlocks
+
     if (isPerfect) {
       setPerfect(true)
+      pointsEarned += overlapBlocks * 2
       setTimeout(() => setPerfect(false), 600)
     }
 
@@ -112,7 +115,7 @@ function App() {
     ])
 
     setMovingRow(null)
-    setScore(s => s + 1)
+    setScore(s => s + pointsEarned)
   }
 
   const reset = () => {
@@ -137,10 +140,7 @@ function App() {
         <h1>🐕 Corgi Stacker</h1>
 
         <div className={`game ${perfect ? 'perfect-flash' : ''}`}>
-          {/* Treat goal */}
-          <div className="treat" style={{ top: GOAL_Y }}>
-            🦴
-          </div>
+          <div className="treat" style={{ top: GOAL_Y }}>🦴</div>
 
           {stack.map((row, i) =>
             Array.from({ length: row.blocks }).map((_, j) => (
