@@ -5,9 +5,9 @@ const GAME_WIDTH = 400
 const GAME_HEIGHT = 400
 const BLOCK_SIZE = 40
 const BLOCK_HEIGHT = 20
-const INITIAL_BLOCKS = 4 // start narrower
-const MOVE_SPEED_BASE = 400 // milliseconds per block, slowest
-const SPEED_INCREASE = 15 // speed up per row
+const INITIAL_BLOCKS = 4
+const MOVE_SPEED_BASE = 400
+const SPEED_INCREASE = 15
 
 const snapToGrid = x => Math.floor(x / BLOCK_SIZE) * BLOCK_SIZE
 
@@ -23,22 +23,25 @@ function App() {
   const [direction, setDirection] = useState(1)
   const [gameOver, setGameOver] = useState(false)
   const [score, setScore] = useState(0)
+  const [perfect, setPerfect] = useState(false)
 
   const topRow = stack[stack.length - 1]
   const corgiX = topRow.x + (topRow.blocks * BLOCK_SIZE) / 2 - 20
   const corgiY = topRow.y - 30
 
-  // Spawn new moving row
+  // Spawn moving row
   useEffect(() => {
     if (!movingRow && !gameOver) {
-      const y = topRow.y - BLOCK_HEIGHT
-      const blocks = topRow.blocks
-      setMovingRow({ x: 0, y, blocks })
+      setMovingRow({
+        x: 0,
+        y: topRow.y - BLOCK_HEIGHT,
+        blocks: topRow.blocks,
+      })
       setDirection(1)
     }
   }, [movingRow, topRow, gameOver])
 
-  // Move the sliding row in grid-aligned steps
+  // Move row on grid
   useEffect(() => {
     if (!movingRow || gameOver) return
 
@@ -59,20 +62,20 @@ function App() {
         setDirection(newDir)
         return { ...prev, x: newX }
       })
-    }, Math.max(50, MOVE_SPEED_BASE - stack.length * SPEED_INCREASE)) // faster as stack grows
+    }, Math.max(60, MOVE_SPEED_BASE - stack.length * SPEED_INCREASE))
 
     return () => clearInterval(interval)
-  }, [movingRow, direction, stack, gameOver])
+  }, [movingRow, direction, stack.length, gameOver])
 
-  // Drop the moving row
+  // Drop row
   const drop = () => {
     if (!movingRow || gameOver) return
 
-    const prevRow = topRow
-    const overlapStart = Math.max(movingRow.x, prevRow.x)
+    const prev = topRow
+    const overlapStart = Math.max(movingRow.x, prev.x)
     const overlapEnd = Math.min(
       movingRow.x + movingRow.blocks * BLOCK_SIZE,
-      prevRow.x + prevRow.blocks * BLOCK_SIZE
+      prev.x + prev.blocks * BLOCK_SIZE
     )
     const overlapBlocks = Math.floor((overlapEnd - overlapStart) / BLOCK_SIZE)
 
@@ -81,14 +84,25 @@ function App() {
       return
     }
 
-    const snappedX = snapToGrid(overlapStart)
+    const isPerfect =
+      overlapBlocks === prev.blocks && overlapStart === prev.x
 
-    setStack(p => [
-      ...p,
-      { x: snappedX, y: movingRow.y, blocks: overlapBlocks },
+    if (isPerfect) {
+      setPerfect(true)
+      setTimeout(() => setPerfect(false), 600)
+    }
+
+    setStack(prevStack => [
+      ...prevStack,
+      {
+        x: snapToGrid(overlapStart),
+        y: movingRow.y,
+        blocks: overlapBlocks,
+      },
     ])
+
     setMovingRow(null)
-    setScore(score + 1)
+    setScore(s => s + 1)
   }
 
   const reset = () => {
@@ -103,6 +117,7 @@ function App() {
     setDirection(1)
     setGameOver(false)
     setScore(0)
+    setPerfect(false)
   }
 
   return (
@@ -110,7 +125,7 @@ function App() {
       <div className="card" onClick={drop}>
         <h1>🐕 Corgi Stacker</h1>
 
-        <div className="game">
+        <div className={`game ${perfect ? 'perfect-flash' : ''}`}>
           {stack.map((row, i) =>
             Array.from({ length: row.blocks }).map((_, j) => (
               <div
@@ -134,6 +149,8 @@ function App() {
             🐕
           </div>
 
+          {perfect && <div className="perfect-text">✨ PERFECT! ✨</div>}
+
           {gameOver && (
             <div className="overlay">
               <p>💥 Game Over</p>
@@ -143,7 +160,7 @@ function App() {
         </div>
 
         <p className="score">Score: {score}</p>
-        <p className="hint">Click to drop the moving row!</p>
+        <p className="hint">Click to drop the moving row</p>
       </div>
     </div>
   )
