@@ -132,3 +132,11 @@ button:hover {
 .perfect-flash .block {
   background: linear-gradient(135deg, #6dff8b, #9bffb0);
 }
+
+.treat {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 26px;
+  pointer-events: none;
+}
