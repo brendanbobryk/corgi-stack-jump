@@ -33,6 +33,13 @@ function App() {
   const corgiX = topRow.x + (topRow.blocks * BLOCK_SIZE) / 2 - 20
   const corgiY = topRow.y - 30
 
+  // Speed indicator
+  const speedTier = stack.length
+  let speedLabel = '💤 Chill'
+  if (speedTier >= 4 && speedTier <= 7) speedLabel = '👀 Focused'
+  else if (speedTier >= 8 && speedTier <= 11) speedLabel = '🔥 Fast'
+  else if (speedTier >= 12) speedLabel = '😵 Panic'
+
   // Load high score
   useEffect(() => {
     const saved = localStorage.getItem('corgiStackerHighScore')
@@ -120,7 +127,6 @@ function App() {
       setTimeout(() => setPerfect(false), 600)
     }
 
-    // Scoring
     const basePoints = overlapBlocks
     const bonusPoints = isPerfect ? PERFECT_BONUS : 0
     setScore(s => s + basePoints + bonusPoints)
@@ -204,6 +210,7 @@ function App() {
         <p className="score">
           Score: {score} | Best: {highScore}
         </p>
+        <p className="speed">Speed: {speedLabel}</p>
         <p className="hint">Click to drop the moving row</p>
       </div>
     </div>

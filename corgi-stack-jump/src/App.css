@@ -140,3 +140,9 @@ button:hover {
   font-size: 26px;
   pointer-events: none;
 }
+
+.speed {
+  margin-top: 4px;
+  color: #aaa;
+  font-size: 0.9rem;
+}
