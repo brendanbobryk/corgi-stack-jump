@@ -9,6 +9,7 @@ const INITIAL_BLOCKS = 4
 const MOVE_SPEED_BASE = 400
 const SPEED_INCREASE = 15
 const GOAL_Y = 40
+const PERFECT_BONUS = 5
 
 const snapToGrid = x => Math.floor(x / BLOCK_SIZE) * BLOCK_SIZE
 
@@ -48,7 +49,7 @@ function App() {
     }
   }, [score, highScore])
 
-  // Check win condition
+  // Win condition
   useEffect(() => {
     if (topRow.y <= GOAL_Y && !win) {
       setWin(true)
@@ -119,6 +120,11 @@ function App() {
       setTimeout(() => setPerfect(false), 600)
     }
 
+    // Scoring
+    const basePoints = overlapBlocks
+    const bonusPoints = isPerfect ? PERFECT_BONUS : 0
+    setScore(s => s + basePoints + bonusPoints)
+
     setStack(prevStack => [
       ...prevStack,
       {
@@ -129,7 +135,6 @@ function App() {
     ])
 
     setMovingRow(null)
-    setScore(s => s + 1)
   }
 
   const reset = () => {
