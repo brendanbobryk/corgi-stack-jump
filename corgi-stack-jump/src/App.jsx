@@ -26,12 +26,29 @@ function App() {
   const [win, setWin] = useState(false)
   const [score, setScore] = useState(0)
   const [perfect, setPerfect] = useState(false)
+  const [highScore, setHighScore] = useState(0)
 
   const topRow = stack[stack.length - 1]
   const corgiX = topRow.x + (topRow.blocks * BLOCK_SIZE) / 2 - 20
   const corgiY = topRow.y - 30
 
-  // Win condition
+  // Load high score
+  useEffect(() => {
+    const saved = localStorage.getItem('corgiStackerHighScore')
+    if (saved) {
+      setHighScore(Number(saved))
+    }
+  }, [])
+
+  // Save high score
+  useEffect(() => {
+    if (score > highScore) {
+      setHighScore(score)
+      localStorage.setItem('corgiStackerHighScore', score)
+    }
+  }, [score, highScore])
+
+  // Check win condition
   useEffect(() => {
     if (topRow.y <= GOAL_Y && !win) {
       setWin(true)
@@ -97,11 +114,8 @@ function App() {
     const isPerfect =
       overlapBlocks === prev.blocks && overlapStart === prev.x
 
-    let pointsEarned = overlapBlocks
-
     if (isPerfect) {
       setPerfect(true)
-      pointsEarned += overlapBlocks * 2
       setTimeout(() => setPerfect(false), 600)
     }
 
@@ -115,7 +129,7 @@ function App() {
     ])
 
     setMovingRow(null)
-    setScore(s => s + pointsEarned)
+    setScore(s => s + 1)
   }
 
   const reset = () => {
@@ -182,7 +196,9 @@ function App() {
           )}
         </div>
 
-        <p className="score">Score: {score}</p>
+        <p className="score">
+          Score: {score} | Best: {highScore}
+        </p>
         <p className="hint">Click to drop the moving row</p>
       </div>
     </div>
