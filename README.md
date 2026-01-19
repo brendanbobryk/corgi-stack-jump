@@ -11,6 +11,8 @@ This project was built as part of a daily game challenge to practice React funda
 - Increasing speed as the corgi stacks higher
 - Dog mascot sits on top of the stack
 - Score tracking for successful stacks
+- Persistent high score using localStorage
+- Speed indicator showing current stack speed
 - Classic Stacker arcade feel
 - Dark-themed, easy-on-the-eyes layout
 
